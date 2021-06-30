@@ -1,5 +1,5 @@
 {
-  "name": "iosevka",
+  "name": "iosevnya",
   "version": "7.2.7",
   "main": "./font-src/index.js",
   "scripts": {
@@ -9,13 +9,13 @@
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",
-    "@msgpack/msgpack": "^2.6.3",
-    "@unicode/unicode-13.0.0": "^1.0.6",
-    "cldr": "^6.1.0",
+    "@msgpack/msgpack": "^2.7.0",
+    "@unicode/unicode-13.0.0": "^1.1.0",
+    "cldr": "^7.0.0",
     "ejs": "^3.1.6",
     "fs-extra": "^10.0.0",
-    "ot-builder": "^1.0.6",
-    "otb-ttc-bundle": "^1.0.4",
+    "ot-builder": "^1.0.10",
+    "otb-ttc-bundle": "^1.0.10",
     "patel": "^0.34.0",
     "semver": "^7.3.5",
     "spiro": "^3.0.0",
@@ -27,9 +27,9 @@
     "which": "^2.0.2"
   },
   "devDependencies": {
-    "eslint": "^7.26.0",
+    "eslint": "^7.30.0",
     "eslint-config-prettier": "^8.3.0",
-    "prettier": "^2.2.1"
+    "prettier": "^2.3.2"
   },
   "engines": {
     "node": ">=12.16.0"
