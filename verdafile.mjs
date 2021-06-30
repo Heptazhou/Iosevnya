@@ -13,36 +13,28 @@ import which from "which";
 export const build = Verda.create();
 const { task, file, oracle, computed } = build.ruleTypes;
 const { de, fu, sfu, ofu } = build.rules;
-const { run, node, cd, cp, rm, fail, echo, silently, absolutelySilently } = build.actions;
+const { rm, fail, echo, silently, absolutelySilently } = build.actions;
 const { FileList } = build.predefinedFuncs;
 
 ///////////////////////////////////////////////////////////
 
 const BUILD = ".build";
 const DIST = "dist";
-const IMAGES = "images";
 
-const IMAGE_TASKS = ".build/image-tasks";
-const GLYF_TTC = ".build/glyf-ttc";
+const GLYF_TTC = `${BUILD}/ttc-glyf`;
 
 const SHARED_CACHE = `${BUILD}/cache`;
-const DIST_TTC = "dist/.ttc";
-const DIST_SUPER_TTC = "dist/.super-ttc";
-const ARCHIVE_DIR = "release-archives";
 
 const PATEL_C = ["node", "node_modules/patel/bin/patel-c"];
 const MAKE_TTC = ["node", "node_modules/otb-ttc-bundle/bin/otb-ttc-bundle"];
-const SEVEN_ZIP = process.env.SEVEN_ZIP_PATH || "7z";
 const TTFAUTOHINT = process.env.TTFAUTOHINT_PATH || "ttfautohint";
 
 const defaultWebFontFormats = ["WOFF2", "TTF"];
-const webfontFormatsFast = ["TTF"];
-const webfontFormatsPages = ["WOFF2"];
 
-const WIDTH_NORMAL = "Normal";
-const WEIGHT_NORMAL = "Regular";
-const SLOPE_NORMAL = "Upright";
-const DEFAULT_SUBFAMILY = "Regular";
+const WIDTH_NORMAL = "normal";
+const WEIGHT_NORMAL = "regular";
+const SLOPE_NORMAL = "upright";
+const DEFAULT_SUBFAMILY = "regular";
 
 const BUILD_PLANS = "build-plans.toml";
 const PRIVATE_BUILD_PLANS = "private-build-plans.toml";
@@ -374,9 +366,7 @@ function makeFileName(prefix, suffix) {
 }
 function makeSuffix(w, wd, s, fallback) {
 	return (
-		(wd === WIDTH_NORMAL ? "" : wd) +
-			(w === WEIGHT_NORMAL ? "" : w) +
-			(s === SLOPE_NORMAL ? "" : s) || fallback
+		(wd === WIDTH_NORMAL ? "" : wd + "-") + w + (s === SLOPE_NORMAL ? "" : "-" + s) || fallback
 	);
 }
 
@@ -392,7 +382,7 @@ function whyBuildPlanIsnNotThere(gid) {
 
 const ageKey = uuid.v4();
 const DistUnhintedTTF = file.make(
-	(gr, fn) => `${DIST}/${gr}/TTF-Unhinted/${fn}.ttf`,
+	(gr, fn) => `${DIST}/${gr}/ttf-unhinted/${fn}.ttf`,
 	async (target, out, gr, fn) => {
 		await target.need(Scripts, Parameters, Dependencies, de(out.dir));
 		const [fi] = await target.need(FontInfoOf(fn));
@@ -464,32 +454,32 @@ const DistUnhintedTTF = file.make(
 );
 
 const BuildCM = file.make(
-	(gr, f) => `${BUILD}/TTF/${gr}/${f}.charmap.mpz`,
+	(gr, f) => `${BUILD}/ttf/${gr}/${f}.charmap.mpz`,
 	async (target, output, gr, f) => {
 		await target.need(DistUnhintedTTF(gr, f));
 	}
 );
 const BuildTtfaControls = file.make(
-	(gr, f) => `${BUILD}/TTF/${gr}/${f}.ttfa.txt`,
+	(gr, f) => `${BUILD}/ttf/${gr}/${f}.ttfa.txt`,
 	async (target, output, gr, f) => {
 		await target.need(DistUnhintedTTF(gr, f));
 	}
 );
 const BuildNoGcUnhintedTtfImpl = file.make(
-	(gr, f) => `${BUILD}/TTF/${gr}/${f}.no-gc.ttf`,
+	(gr, f) => `${BUILD}/ttf/${gr}/${f}.no-gc.ttf`,
 	async (target, output, gr, f) => {
 		await target.need(DistUnhintedTTF(gr, f));
 	}
 );
 const BuildNoGcTtfImpl = file.make(
-	(gr, f) => `${BUILD}/TTF/${gr}/${f}.no-gc.hinted.ttf`,
+	(gr, f) => `${BUILD}/ttf/${gr}/${f}.no-gc.hinted.ttf`,
 	async (target, output, gr, f) => {
 		await target.need(DistHintedTTF(gr, f));
 	}
 );
 
 const DistHintedTTF = file.make(
-	(gr, fn) => `${DIST}/${gr}/TTF/${fn}.ttf`,
+	(gr, fn) => `${DIST}/${gr}/ttf/${fn}.ttf`,
 	async (target, out, gr, fn) => {
 		const [fi, hint] = await target.need(
 			FontInfoOf(fn),
@@ -542,10 +532,10 @@ const BuildNoGcTtf = task.make(
 );
 
 function formatSuffix(fmt, unhinted) {
-	return fmt + (unhinted ? "-Unhinted" : "");
+	return fmt + (unhinted ? "-unhinted" : "");
 }
 const DistWoff2 = file.make(
-	(gr, fn, unhinted) => `${DIST}/${gr}/${formatSuffix("WOFF2", unhinted)}/${fn}.woff2`,
+	(gr, fn, unhinted) => `${DIST}/${gr}/${formatSuffix("woff2", unhinted)}/${fn}.woff2`,
 	async (target, out, group, f, unhinted) => {
 		const Ctor = unhinted ? DistUnhintedTTF : DistHintedTTF;
 
@@ -636,7 +626,7 @@ const GroupWebFontsImpl = task.make(
 		const [bp] = await target.need(BuildPlanOf(gr));
 		const groupsNeeded = [];
 		for (const ext of bp.webfontFormats) {
-			switch (ext) {
+			switch (`${ext}`.toUpperCase()) {
 				case "TTF":
 					groupsNeeded.push(GroupTtfsImpl(gr, unhinted));
 					break;
@@ -744,17 +734,17 @@ function fnStandardTtc(fIsGlyfTtc, prefix, suffixMapping, sfi) {
 //////               Font Collection                 //////
 ///////////////////////////////////////////////////////////
 
-const SpecificTtc = task.group(`ttc`, async (target, cgr) => {
+const SpecificTtc = task.group(`ttc-glyf`, async (target, cgr) => {
 	const [cPlan] = await target.need(CollectPlans);
 	const ttcFiles = Array.from(Object.keys(cPlan[cgr].ttcComposition));
 	await target.need(ttcFiles.map(pt => CollectedTtcFile(cgr, pt)));
 });
-const SpecificSuperTtc = task.group(`super-ttc`, async (target, cgr) => {
+const SpecificSuperTtc = task.group(`ttc`, async (target, cgr) => {
 	await target.need(CollectedSuperTtcFile(cgr));
 });
 
 const CollectedSuperTtcFile = file.make(
-	cgr => `${DIST_SUPER_TTC}/${cgr}.ttc`,
+	cgr => `${DIST}/${cgr}/${cgr}.ttc`,
 	async (target, out, cgr) => {
 		const [cp] = await target.need(CollectPlans, de(out.dir));
 		const parts = Array.from(Object.keys(cp[cgr].glyfTtcComposition));
@@ -763,7 +753,7 @@ const CollectedSuperTtcFile = file.make(
 	}
 );
 const CollectedTtcFile = file.make(
-	(cgr, f) => `${DIST_TTC}/${cgr}/${f}.ttc`,
+	(cgr, f) => `${DIST}/${cgr}/ttc/${f}.ttc`,
 	async (target, out, cgr, f) => {
 		const [cp] = await target.need(CollectPlans, de`${out.dir}`);
 		const parts = Array.from(new Set(cp[cgr].ttcComposition[f]));
@@ -795,348 +785,18 @@ async function buildGlyphSharingTtc(target, parts, out) {
 }
 
 ///////////////////////////////////////////////////////////
-//////                   Archives                    //////
-///////////////////////////////////////////////////////////
-
-// Collection Archives
-const TtcZip = file.make(
-	(cgr, version) => `${ARCHIVE_DIR}/PkgTTC-${cgr}-${version}.zip`,
-	async (target, out, cgr) => {
-		const [cPlan] = await target.need(CollectPlans, de`${out.dir}`);
-		const ttcFiles = Array.from(Object.keys(cPlan[cgr].ttcComposition));
-		await target.need(ttcFiles.map(pt => CollectedTtcFile(cgr, pt)));
-		await CreateGroupArchiveFile(`${DIST_TTC}/${cgr}`, out, `*.ttc`);
-	}
-);
-const SuperTtcZip = file.make(
-	(cgr, version) => `${ARCHIVE_DIR}/SuperTTC-${cgr}-${version}.zip`,
-	async (target, out, cgr) => {
-		await target.need(de`${out.dir}`, CollectedSuperTtcFile(cgr));
-		await CreateGroupArchiveFile(DIST_SUPER_TTC, out, `${cgr}.ttc`);
-	}
-);
-
-// Single-group Archives
-const GroupTtfZip = file.make(
-	(gr, version, unhinted) =>
-		`${ARCHIVE_DIR}/${formatSuffix("PkgTTF", unhinted)}-${gr}-${version}.zip`,
-	async (target, out, gr, _version_, unhinted) => {
-		await target.need(de`${out.dir}`);
-		await target.need(GroupTtfsImpl(gr, unhinted));
-		await CreateGroupArchiveFile(
-			`${DIST}/${gr}/${formatSuffix("TTF", unhinted)}`,
-			out,
-			"*.ttf"
-		);
-	}
-);
-const GroupWebZip = file.make(
-	(gr, version, unhinted) =>
-		`${ARCHIVE_DIR}/${formatSuffix("PkgWebFont", unhinted)}-${gr}-${version}.zip`,
-	async (target, out, gr, _version_, unhinted) => {
-		const [plan] = await target.need(BuildPlanOf(gr));
-		await target.need(de`${out.dir}`);
-		await target.need(GroupWebFontsImpl(gr, unhinted));
-		await CreateGroupArchiveFile(
-			`${DIST}/${gr}`,
-			out,
-			`${formatSuffix(gr, unhinted)}.css`,
-			...plan.webfontFormats.map(format => formatSuffix(format, unhinted))
-		);
-	}
-);
-
-async function CreateGroupArchiveFile(dir, out, ...files) {
-	const relOut = Path.relative(dir, out.full);
-	await rm(out.full);
-	echo.action(echo.hl.command("Create Archive"), out.full);
-	await cd(dir).silently.run(
-		[SEVEN_ZIP, "a"],
-		["-tzip", "-r", "-mx=9", "-mmt=off"],
-		relOut,
-		...files
-	);
-}
-
-///////////////////////////////////////////////////////////
-//////                    Exports                    //////
-///////////////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////
-// Sample Images
-
-const Pages = task(`pages`, async t => {
-	await t.need(
-		PagesDataExport,
-		PagesFontExport`Iosevka`,
-		PagesFontExport`IosevkaSlab`,
-		PagesFontExport`IosevkaAile`,
-		PagesFontExport`IosevkaEtoile`,
-		PagesFontExport`IosevkaQp`,
-		PagesFontExport`IosevkaQpSlab`,
-		PagesFontExport`IosevkaQpe`,
-		PagesFontExport`IosevkaQpeSlab`
-	);
-});
-
-const PagesDir = oracle(`pages-dir-path`, async t => {
-	const [rp] = await t.need(RawPlans);
-	if (!rp.buildOptions || !rp.buildOptions.__pagesDir) fail("Pages directory not found");
-	return rp.buildOptions.__pagesDir;
-});
-
-const PagesDataExport = task(`pages:data-export`, async t => {
-	const [version] = await t.need(Version);
-	const [pagesDir] = await t.need(PagesDir, Version, Parameters, UtilScripts);
-	const [cm, cmi, cmo] = await t.need(
-		BuildCM("Iosevka", "Iosevka-Regular"),
-		BuildCM("Iosevka", "Iosevka-Italic"),
-		BuildCM("Iosevka", "Iosevka-Oblique")
-	);
-	await node(`tools/generate-samples/src/tokenized-sample-code.mjs`, {
-		output: Path.resolve(pagesDir, "shared/tokenized-sample-code/alphabet.txt.json")
-	});
-	await node(`tools/data-export/src/index.mjs`, {
-		version,
-		paramsDir: Path.resolve("params"),
-		charMapPath: cm.full,
-		charMapItalicPath: cmi.full,
-		charMapObliquePath: cmo.full,
-		exportPathMeta: Path.resolve(pagesDir, "shared/data-import/raw/metadata.json"),
-		exportPathCov: Path.resolve(pagesDir, "shared/data-import/raw/coverage.json")
-	});
-});
-
-const PagesFontExport = task.group(`pages:font-export`, async (target, gr) => {
-	target.is.volatile();
-	const [pagesDir] = await target.need(PagesDir);
-	if (!pagesDir) return;
-	const outDir = Path.resolve(pagesDir, "shared/fonts/imports", gr);
-	await target.need(GroupWebFontsImpl(gr, false), de(outDir));
-	await cp(`${DIST}/${gr}/WOFF2`, Path.resolve(outDir, "WOFF2"));
-	await createWebFontCssImpl(target, Path.resolve(outDir, `${gr}.css`), gr, webfontFormatsPages);
-	await rm(Path.resolve(outDir, "TTF"));
-});
-
-const PagesFastFontExport = task.group(`pages:fast-font-export`, async (target, gr) => {
-	target.is.volatile();
-	const [pagesDir] = await target.need(PagesDir);
-	if (!pagesDir) return;
-	const outDir = Path.resolve(pagesDir, "shared/fonts/imports", gr);
-	await target.need(GroupTtfsImpl(gr, true), de(outDir));
-
-	// Next.js 12 has some problem about refreshing fonts, so write an empty CSS first
-	await createWebFontCssImpl(target, Path.resolve(outDir, `${gr}.css`), gr, null);
-	await Delay(2000);
-
-	// Then do the copy
-	await cp(`${DIST}/${gr}/TTF-Unhinted`, Path.resolve(outDir, "TTF"));
-	await createWebFontCssImpl(target, Path.resolve(outDir, `${gr}.css`), gr, webfontFormatsFast);
-	await rm(Path.resolve(outDir, "WOFF2"));
-});
-
-///////////////////////////////////////////////////////////
-// README
-
-const AmendReadme = task("amend-readme", async target => {
-	await target.need(
-		AmendReadmeFor("README.md"),
-		AmendReadmeFor("doc/stylistic-sets.md"),
-		AmendReadmeFor("doc/character-variants.md"),
-		AmendReadmeFor("doc/custom-build.md"),
-		AmendReadmeFor("doc/language-specific-ligation-sets.md"),
-		AmendReadmeFor("doc/cv-influences.md"),
-		AmendReadmeFor("doc/PACKAGE-LIST.md"),
-		AmendLicenseYear
-	);
-});
-const AmendReadmeFor = task.make(
-	f => `amend-readme::for::${f}`,
-	async (target, f) => {
-		const [version] = await target.need(Version, Parameters, UtilScripts);
-		const [rpFiles] = await target.need(ReleaseNotePackagesFile);
-		const [cm, cmi, cmo] = await target.need(
-			BuildCM("Iosevka", "Iosevka-Regular"),
-			BuildCM("Iosevka", "Iosevka-Italic"),
-			BuildCM("Iosevka", "Iosevka-Oblique")
-		);
-		return node(`tools/amend-readme/src/index.mjs`, {
-			version,
-			projectRoot: Path.resolve("."),
-			paramsDir: Path.resolve("params"),
-			mdFilePath: f,
-			releasePackagesJsonPath: rpFiles.full,
-			charMapPath: cm.full,
-			charMapItalicPath: cmi.full,
-			charMapObliquePath: cmo.full
-		});
-	}
-);
-const ReleaseNotePackagesFile = file(`${BUILD}/release-packages.json`, async (t, out) => {
-	const [cp] = await t.need(CollectPlans);
-	const [{ buildPlans }] = await t.need(BuildPlans);
-	let releaseNoteGroups = {};
-	for (const [k, plan] of Object.entries(cp)) {
-		if (!plan.inRelease || plan.isAmended) continue;
-		const primePlan = buildPlans[plan.groupDecomposition[0]];
-		let subGroups = {};
-		for (const gr of plan.groupDecomposition) {
-			const bp = buildPlans[gr];
-			subGroups[gr] = {
-				family: bp.family,
-				desc: bp.desc,
-				spacing: buildPlans[gr].spacing || "type"
-			};
-		}
-		releaseNoteGroups[k] = {
-			subGroups,
-			slab: primePlan.serifs === "slab",
-			quasiProportional: primePlan.spacing === "quasi-proportional"
-		};
-	}
-	await FS.promises.writeFile(out.full, JSON.stringify(releaseNoteGroups, null, "  "));
-});
-const AmendLicenseYear = task("amend-readme:license-year", async target => {
-	return node(`tools/amend-readme/src/license-year.mjs`, {
-		path: "LICENSE.md"
-	});
-});
-
-///////////////////////////////////////////////////////////
-// Sample Images
-
-const SampleImages = task(`sample-images`, async target => {
-	const [tasksToTake] = await target.need(SampleImagesPre, de(IMAGES));
-	let tasks = [];
-	for (const id of tasksToTake) tasks.push(ScreenShotImpl(id));
-	await target.need(tasks);
-});
-
-const SampleImagesPre = task(`sample-images:pre`, async target => {
-	const [version] = await target.need(Version, de(IMAGE_TASKS), UtilScripts);
-	const fontGroups = await target.need(
-		GroupTtfsImpl(`Iosevka`, false),
-		GroupTtfsImpl(`IosevkaSlab`, false),
-		GroupTtfsImpl(`IosevkaAile`, false),
-		GroupTtfsImpl(`IosevkaEtoile`, false)
-	);
-	const [cm, cmi, cmo] = await target.need(
-		BuildCM("Iosevka", "Iosevka-Regular"),
-		BuildCM("Iosevka", "Iosevka-Italic"),
-		BuildCM("Iosevka", "Iosevka-Oblique")
-	);
-	return await node("tools/generate-samples/src/index.mjs", {
-		version,
-		paramsDir: Path.resolve("params"),
-		outputDir: IMAGE_TASKS,
-		packageSnapshotTasks: await PackageSnapshotConfig(target),
-		fontGroups: fontGroups,
-		charMapPath: cm.full,
-		charMapItalicPath: cmi.full,
-		charMapObliquePath: cmo.full
-	});
-});
-const PackageSnapshotConfig = async target => {
-	const [plan] = await target.need(BuildPlans);
-	const cfg = [];
-	for (const key in plan.buildPlans) {
-		const p = plan.buildPlans[key];
-		if (!p || !p.snapshotFamily) continue;
-		cfg.push({
-			name: "package-sample-" + key,
-			fontFamily: p.snapshotFamily,
-			fontFeatures: p.snapshotFeature
-		});
-	}
-	return cfg;
-};
-
-const ScreenShotImpl = file.make(
-	img => `${IMAGES}/${img}.svg`,
-	async (target, out, id) => {
-		const [rp] = await target.need(RawPlans);
-		await target.need(SampleImagesPre, de(IMAGES));
-		await run(rp.buildOptions.snapshotGeneratorApp, [
-			`${IMAGE_TASKS}/${id}.json`,
-			"-o",
-			out.full
-		]);
-	}
-);
-
-///////////////////////////////////////////////////////////
-// Release notes
-
-const ReleaseNotes = task(`release:release-note`, async t => {
-	const [version] = await t.need(Version);
-	await t.need(ReleaseNotesFile(version));
-});
-const ReleaseNotesFile = file.make(
-	version => `${ARCHIVE_DIR}/release-notes-${version}.md`,
-	async (t, out, version) => {
-		await t.need(Version, UtilScripts, de(ARCHIVE_DIR));
-		const [changeFiles] = await t.need(ChangeFileList());
-		await t.need(changeFiles.map(fu));
-		await node("tools/amend-readme/src/generate-release-note.mjs", {
-			version,
-			outputPath: out.full
-		});
-	}
-);
-
-const ChangeLog = task(`release:change-log`, async t => {
-	await t.need(ChangeLogMd);
-});
-const ChangeLogMd = file(`CHANGELOG.md`, async (t, out) => {
-	const [version] = await t.need(Version);
-	await t.need(UtilScripts, de(ARCHIVE_DIR));
-	const [changeFiles] = await t.need(ChangeFileList());
-	await t.need(changeFiles.map(fu));
-	await node("tools/amend-readme/src/generate-change-log.mjs", { version, outputPath: out.full });
-});
-const ChangeFileList = oracle.make(
-	() => `release:change-file-list`,
-	target => FileList({ under: "changes", pattern: "*.md" })(target)
-);
-
-///////////////////////////////////////////////////////////
 //////                   Entries                     //////
 ///////////////////////////////////////////////////////////
 
 const Clean = task(`clean`, async () => {
 	await rm(BUILD);
-	await rm(DIST);
-	await rm(ARCHIVE_DIR);
 	build.deleteJournal();
 });
 
-const CleanDist = task(`clean-dist`, async () => {
+const FullClean = task(`full-clean`, async () => {
+	await rm(BUILD);
 	await rm(DIST);
-	await rm(ARCHIVE_DIR);
-});
-
-const Release = task(`release`, async target => {
-	await target.need(ReleaseArchives, SampleImages, Pages, AmendReadme, ReleaseNotes, ChangeLog);
-});
-
-const ReleaseArchives = task(`release:archives`, async target => {
-	const [version, collectPlans] = await target.need(Version, CollectPlans, UtilScriptFiles);
-	let goals = [];
-	for (const [cgr, plan] of Object.entries(collectPlans)) {
-		if (!plan.inRelease) continue;
-		const subGroups = collectPlans[cgr].groupDecomposition;
-		goals.push(TtcZip(cgr, version));
-		goals.push(SuperTtcZip(cgr, version));
-		for (const gr of subGroups) {
-			goals.push(GroupTtfZip(gr, version, false));
-			goals.push(GroupTtfZip(gr, version, true));
-			goals.push(GroupWebZip(gr, version, false));
-			goals.push(GroupWebZip(gr, version, true));
-		}
-	}
-	const [archiveFiles] = await target.need(goals);
-	// Create hash of packages
-	await node("tools/misc/src/create-sha-file.mjs", "doc/packages-sha.txt", archiveFiles);
+	build.deleteJournal();
 });
 
 ///////////////////////////////////////////////////////////
@@ -1306,7 +966,7 @@ function validateRecommendedWeight(w, value, label) {
 		semibold: 600,
 		bold: 700,
 		extrabold: 800,
-		heavy: 900
+		black: 900
 	};
 	if (RecommendedMenuWeights[w] && RecommendedMenuWeights[w] !== value) {
 		echo.warn(
