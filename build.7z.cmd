@@ -1,6 +1,6 @@
 @echo off
 chcp  65001>nul
-set   VERSION=v0.0.0-0
+set   VERSION=v27.3.5-1
 set   NAME=iosevnya
 set   ARGS=-m0=lzma -md3840m -mfb273 -mmt2 -mqs -ms -mtm- -mx9 -stl
 cd    dist
