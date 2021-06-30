@@ -27,7 +27,7 @@ const GLYF_TTC = ".build/glyf-ttc";
 
 const SHARED_CACHE = `${BUILD}/cache`;
 const DIST_TTC = "dist/.ttc";
-const DIST_SUPER_TTC = "dist/.super-ttc";
+const DIST_SUPER_TTC = "dist/@TTC";
 const ARCHIVE_DIR = "release-archives";
 
 const PATEL_C = ["node", "node_modules/patel/bin/patel-c"];
@@ -350,9 +350,7 @@ function makeFileName(prefix, suffix) {
 }
 function makeSuffix(w, wd, s, fallback) {
 	return (
-		(wd === WIDTH_NORMAL ? "" : wd) +
-			(w === WEIGHT_NORMAL ? "" : w) +
-			(s === SLOPE_NORMAL ? "" : s) || fallback
+		(wd === WIDTH_NORMAL ? "" : wd + "-") + w + (s === SLOPE_NORMAL ? "" : "-" + s) || fallback
 	);
 }
 
@@ -637,12 +635,7 @@ function fnStandardTtc(fIsGlyfTtc, prefix, suffixMapping, sfi) {
 //////               Font Collection                 //////
 ///////////////////////////////////////////////////////////
 
-const SpecificTtc = task.group(`ttc`, async (target, cgr) => {
-	const [cPlan] = await target.need(CollectPlans);
-	const ttcFiles = Array.from(Object.keys(cPlan[cgr].ttcComposition));
-	await target.need(ttcFiles.map(pt => CollectedTtcFile(cgr, pt)));
-});
-const SpecificSuperTtc = task.group(`super-ttc`, async (target, cgr) => {
+const SpecificSuperTtc = task.group(`ttc`, async (target, cgr) => {
 	await target.need(CollectedSuperTtcFile(cgr));
 });
 
@@ -981,6 +974,9 @@ const ChangeFileList = oracle.make(
 ///////////////////////////////////////////////////////////
 
 const Clean = task(`clean`, async () => {
+	build.deleteJournal();
+});
+const FullClean = task(`full-clean`, async () => {
 	await rm(BUILD);
 	await rm(DIST);
 	await rm(ARCHIVE_DIR);
@@ -1131,7 +1127,7 @@ function validateRecommendedWeight(w, value, label) {
 		semibold: 600,
 		bold: 700,
 		extrabold: 800,
-		heavy: 900
+		black: 900
 	};
 	if (RecommendedMenuWeights[w] && RecommendedMenuWeights[w] !== value) {
 		echo.warn(

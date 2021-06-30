@@ -24,15 +24,14 @@ export function assignFontNames(font, naming, isQuasiProportional) {
 	// Compat banes
 	const compat = getStyleLinkedStyles(naming.weight, naming.width, naming.slope);
 	let compatFamily = family;
-	if (compat.familySuffix !== " Regular") compatFamily = family + " " + compat.familySuffix;
-	if (compatFamily.length >= 31) compatFamily = family + " " + compat.familySuffixShort;
+	compatFamily = family + " " + compat.familySuffix;
 
 	nameFont(font, Ot.Name.NameID.LegacyFamily, compatFamily);
 	nameFont(font, Ot.Name.NameID.LegacySubfamily, compat.style);
 
 	// Unique and Full name
-	const uniqueName = `${family} ${style} ${naming.version}`;
-	const fullName = style !== "Regular" ? `${family} ${style}` : family;
+	const uniqueName = `${family} ${style}`;
+	const fullName = `${family} ${style}`;
 	const postscriptName = fullName.replace(/ /g, "-");
 	nameFont(font, Ot.Name.NameID.UniqueFontId, uniqueName);
 	nameFont(font, Ot.Name.NameID.FullFontName, fullName);
@@ -86,7 +85,9 @@ export function assignFontNames(font, naming, isQuasiProportional) {
 		nameFont(font, Ot.Name.NameID.Manufacturer, naming.miscNames.manufacturer);
 		nameFont(font, Ot.Name.NameID.Designer, naming.miscNames.designer);
 		nameFont(font, Ot.Name.NameID.Description, naming.miscNames.description);
-		nameFont(font, Ot.Name.NameID.LicenseDescription, naming.miscNames.licence);
+		nameFont(font, Ot.Name.NameID.UrlVendor, naming.miscNames.manufacturer_url);
+		nameFont(font, Ot.Name.NameID.LicenseDescription, naming.miscNames.license);
+		nameFont(font, Ot.Name.NameID.LicenseInfoUrl, naming.miscNames.license_url);
 	}
 
 	// Version
@@ -124,7 +125,7 @@ function getStyleLinkedStyles(weight, width, slope) {
 	let nameSuffixWidth = width;
 	let nameSuffixSlope = "normal";
 
-	if (!(linkWeight === 400 || linkWeight == 700)) {
+	{
 		nameSuffixWeight = linkWeight;
 		linkWeight = 400;
 	}
@@ -178,15 +179,15 @@ function getShortStyle(weight, width, slope) {
 
 const weightToMenuStyleMap = {
 	100: "Thin",
-	200: "Extralight",
+	200: "Extra Light",
 	300: "Light",
-	400: "",
+	400: "Regular",
 	450: "Book",
 	500: "Medium",
-	600: "Semibold",
+	600: "Semi Bold",
 	700: "Bold",
-	800: "Extrabold",
-	900: "Heavy"
+	800: "Extra Bold",
+	900: "Black"
 };
 const widthToMenuStyleMap = {
 	1: "Ultra-Condensed",
@@ -208,13 +209,13 @@ const weightToMenuStyleMapShort = {
 	100: "Th",
 	200: "XLt",
 	300: "Lt",
-	400: "",
+	400: "R",
 	450: "Bk",
 	500: "Md",
 	600: "SmBd",
 	700: "Bd",
 	800: "XBd",
-	900: "Hv"
+	900: "Blk"
 };
 const widthToMenuStyleMapShort = {
 	1: "UltCn",
@@ -229,6 +230,6 @@ const widthToMenuStyleMapShort = {
 };
 const slopeToMenuStyleMapShort = {
 	normal: "",
-	italic: "It",
+	italic: "Ita",
 	oblique: "Obl"
 };
