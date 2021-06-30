@@ -21,7 +21,7 @@ module.exports = build;
 const BUILD = ".build";
 const DIST = "dist";
 const SNAPSHOT_TMP = ".build/snapshot";
-const DIST_SUPER_TTC = "dist/.super-ttc";
+const DIST_SUPER_TTC = "dist/@TTC";
 const ARCHIVE_DIR = "release-archives";
 
 const PATEL_C = ["node", "node_modules/patel/bin/patel-c"];
@@ -258,9 +258,7 @@ function makeFileName(prefix, suffix) {
 }
 function makeSuffix(w, wd, s, fallback) {
 	return (
-		(wd === WIDTH_NORMAL ? "" : wd) +
-			(w === WEIGHT_NORMAL ? "" : w) +
-			(s === SLOPE_NORMAL ? "" : s) || fallback
+		(wd === WIDTH_NORMAL ? "" : wd + "-") + w + (s === SLOPE_NORMAL ? "" : "-" + s) || fallback
 	);
 }
 
@@ -455,7 +453,7 @@ function fnStandardTtc(fIsGlyfTtc, prefix, suffixMapping, sfi) {
 //////               Font Collection                 //////
 ///////////////////////////////////////////////////////////
 
-const SpecificSuperTtc = task.group(`super-ttc`, async (target, cgr) => {
+const SpecificSuperTtc = task.group(`ttc`, async (target, cgr) => {
 	await target.need(CollectedSuperTtcFile(cgr));
 });
 const CollectedSuperTtcFile = file.make(
@@ -521,7 +519,7 @@ const TtcArchiveFile = file.make(
 	}
 );
 const SuperTtcArchiveFile = file.make(
-	(cgr, version) => `${ARCHIVE_DIR}/super-ttc-${cgr}-${version}.zip`,
+	(cgr, version) => `${ARCHIVE_DIR}/ttc-${cgr}-${version}.zip`,
 	async (target, out, cgr) => {
 		await target.need(de`${out.dir}`, CollectedSuperTtcFile(cgr));
 
@@ -937,12 +935,12 @@ function validateRecommendedWeight(w, value, label) {
 		extralight: 200,
 		light: 300,
 		regular: 400,
-		book: 450,
+		// book: 450,
 		medium: 500,
 		semibold: 600,
 		bold: 700,
 		extrabold: 800,
-		heavy: 900
+		black: 900
 	};
 	if (RecommendedMenuWeights[w] && RecommendedMenuWeights[w] !== value) {
 		echo.warn(
