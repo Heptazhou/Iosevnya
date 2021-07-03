@@ -1,0 +1,118 @@
+$$include '../../../meta/macros.ptl'
+
+import [mix linreg clamp fallback] from"../../../support/utils.mjs"
+import [Dotless CvDecompose MathSansSerif] from"../../../support/gr.mjs"
+
+glyph-module
+
+glyph-block Letter-Latin-Upper-T : begin
+	glyph-block-import CommonShapes
+	glyph-block-import Common-Derivatives
+	glyph-block-import Letter-Blackboard : BBS BBD
+	glyph-block-import Letter-Latin-Lower-M
+	glyph-block-import Letter-Shared-Shapes : CyrDescender
+
+	define [TLeftX df]  : df.leftSB + OX * 1.5
+	define [TRightX df] : df.rightSB - OX * 1.5
+	define [TShape df top doTopSerifs doBottomSerifs] : glyph-proc
+		include : VBar df.middle 0 top
+		local l : TLeftX df
+		local r : TRightX df
+		include : tagged 'strokeLT' : HBarTop l df.middle top
+		include : tagged 'strokeRT' : HBarTop df.middle r top
+
+		if doTopSerifs : begin
+			include : tagged 'serifRT' : DownwardRightSerif r top VJut
+			include : tagged 'serifLT' : DownwardLeftSerif l top VJut
+		if doBottomSerifs : begin
+			include : tagged 'serifMB' : RightwardBottomSerif df.middle 0 MidJutCenter
+			include : tagged 'serifMB' : LeftwardBottomSerif df.middle 0 MidJutCenter
+
+	define TConfig : object
+		serifless     { 1                           false false }
+		motionSerifed { [mix 1 para.diversityM 0.5] true  false }
+		serifed       { [mix 1 para.diversityM 0.5] true  true  }
+
+	foreach { suffix { div doST doSB } } [Object.entries TConfig] : do
+		local df : DivFrame div
+
+		create-glyph "T.\(suffix)" : glyph-proc
+			set-width df.width
+			include : df.markSet.capital
+			set-base-anchor 'bottomright' (df.middle + HalfStroke * HVContrast) 0
+			include : TShape df CAP doST doSB
+
+		create-glyph "cyrl/TeDescender.\(suffix)" : glyph-proc
+			set-width df.width
+			include : df.markSet.capDesc
+			set-base-anchor 'bottomright' (df.middle + HalfStroke * HVContrast) 0
+			include : TShape df CAP doST doSB
+			include : CyrDescender (df.middle + HalfStroke * HVContrast) (overflow -- [if doSB (MidJutCenter - HalfStroke * HVContrast)])
+
+		create-glyph "TBar.\(suffix)" : glyph-proc
+			include [refer-glyph "T.\(suffix)"] AS_BASE ALSO_METRICS
+			include : HOverlayBar
+				mix df.middle df.leftSB 0.8
+				mix df.middle df.rightSB 0.8
+				mix 0 CAP 0.45
+
+		create-glyph "Thookleft.\(suffix)" : glyph-proc
+			include [refer-glyph "T.\(suffix)"] AS_BASE ALSO_METRICS
+			eject-contour 'serifLT'
+			eject-contour 'strokeLT'
+			include : LeftHook (df.leftSB + LeftHook.extension) CAP df.middle
+
+		create-glyph "smcpT.\(suffix)" : glyph-proc
+			set-width df.width
+			include : df.markSet.e
+			set-base-anchor 'bottomright' (df.middle + HalfStroke * HVContrast) 0
+			include : TShape df XH doST doSB
+
+		create-glyph "cyrl/teDescender.upright.\(suffix)" : glyph-proc
+			set-width df.width
+			include : df.markSet.p
+			include : TShape df XH doST doSB
+			include : CyrDescender (df.middle + HalfStroke * HVContrast) (overflow -- [if doSB (MidJutCenter - HalfStroke * HVContrast)])
+
+		turned "turnT.\(suffix)" nothing "T.\(suffix)" df.middle (CAP / 2)
+
+	select-variant 'T' 'T'
+	link-reduced-variant 'T/sansSerif' 'T' MathSansSerif
+	select-variant 'T/rtailBase' (shapeFrom -- 'T')
+	select-variant 'smcpT' 0x1D1B (follow -- 'T')
+	select-variant "TBar" 0x166 (follow -- 'T')
+	select-variant "Thookleft" 0x1AC (follow -- 'T')
+	select-variant "cyrl/TeDescender" 0x4AC (follow -- 'T')
+	select-variant 'turnT' 0xA7B1 (follow -- 'T')
+
+	alias 'grek/Tau' 0x3A4 'T'
+	alias-reduced-variant 'grek/Tau/sansSerif' 'grek/Tau' 'T/sansSerif' MathSansSerif
+	alias 'cyrl/Te' 0x422 'T'
+
+	alias 'cyrl/te.upright' null 'smcpT'
+	select-variant 'cyrl/teDescender.upright' (follow -- 'T')
+
+	derive-composites 'TRtailBR' 0x1AE 'T/rtailBase' 'rtailBR'
+
+	create-glyph 'mathbb/T' 0x1D54B : glyph-proc
+		local df : DivFrame 1
+		include : df.markSet.capital
+		include : HBarTop [TLeftX df] [TRightX df] CAP BBS
+		include : VBar (df.middle - BBD / 2) 0 CAP BBS
+		include : VBar (df.middle + BBD / 2) 0 CAP BBS
+		include : HBarBottom (df.middle - BBD / 2) (df.middle + BBD / 2) 0 BBS
+
+	create-glyph 'capitalSmcpI' 0xA7AE : glyph-proc
+		local df : DivFrame 1
+		local l : TLeftX df
+		local r : TRightX df
+
+		include : VBar df.middle 0 CAP
+		include : HBarTop l r CAP
+		include : HBarTop l r 0
+
+		if SLAB : begin
+			include : tagged 'serifRT' : DownwardRightSerif r CAP VJut
+			include : tagged 'serifLT' : DownwardLeftSerif l CAP VJut
+			include : tagged 'serifRB' : UpwardRightSerif r 0 VJut
+			include : tagged 'serifLB' : UpwardLeftSerif l 0 VJut
