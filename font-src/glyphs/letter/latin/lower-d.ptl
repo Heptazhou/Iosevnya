@@ -1,0 +1,180 @@
+$$include '../../../meta/macros.ptl'
+
+import [mix linreg clamp fallback] from"../../../support/utils.mjs"
+import [Dotless CvDecompose MathSansSerif] from"../../../support/gr.mjs"
+
+glyph-module
+
+glyph-block Letter-Latin-Lower-D : begin
+	glyph-block-import CommonShapes
+	glyph-block-import Common-Derivatives
+	glyph-block-import Letter-Shared : CreateAccentedComposition
+	glyph-block-import Letter-Shared-Shapes : RightwardTailedBar DToothlessRise DMBlend CurlyTail
+	glyph-block-import Letter-Shared-Shapes : LetterBarOverlay PalatalHook VerticalHook
+
+	define [ToothedBody] : union
+		OBarRightShape
+		VBarRight RightSB 0 Ascender
+
+	define [ToothlessCornerBody] : union
+		OBarRightToothlessShape XH RightSB DToothlessRise DMBlend
+		VBarRight RightSB DToothlessRise Ascender
+
+	define [ToothlessCornerHBBBody] : union
+		OBarRightToothlessShape XH RightSB DToothlessRise DMBlend
+		VBarRight RightSB 0 Ascender
+
+	define [ToothlessRoundedBody] : OBarRightRoundedShape XH RightSB Ascender
+	define [ToothlessRoundedHBBBody] : union
+		OBarRightRoundedShape XH RightSB Ascender
+		VBarRight RightSB 0 Ascender
+
+	define [TailedBody] : union
+		OBarRightShape
+		RightwardTailedBar RightSB 0 Ascender
+
+	define [TopSerif] : tagged 'serifRT'
+		LeftwardTopSerif (RightSB - Stroke * HVContrast) Ascender SideJut
+
+	define [BaseSerif] : tagged 'serifRB'
+		RightwardBottomSerif RightSB 0 SideJut
+
+	define DConfig : object
+		toothedSerifless             { ToothedBody             null     null      }
+		toothedTopSerifed            { ToothedBody             TopSerif null      }
+		toothedSerifed               { ToothedBody             TopSerif BaseSerif }
+		tailedSerifless              { TailedBody              null     null      }
+		tailedSerifed                { TailedBody              TopSerif null      }
+		toothlessCornerSerifless     { ToothlessCornerBody     null     null      }
+		toothlessCornerSerifed       { ToothlessCornerBody     TopSerif null      }
+		toothlessCornerSeriflessHBB  { ToothlessCornerHBBBody  null     null      }
+		toothlessCornerSerifedHBB    { ToothlessCornerHBBBody  TopSerif null      }
+		toothlessRoundedSerifless    { ToothlessRoundedBody    null     null      }
+		toothlessRoundedSerifed      { ToothlessRoundedBody    TopSerif null      }
+		toothlessRoundedSeriflessHBB { ToothlessRoundedHBBBody null     null      }
+		toothlessRoundedSerifedHBB   { ToothlessRoundedHBBBody TopSerif null      }
+
+	foreach { suffix { Body topSerif bottomSerif } } [Object.entries DConfig] : do
+		local yOverlay : mix XH (Ascender - [if topSerif Stroke 0]) 0.5
+
+		create-glyph "d.\(suffix)" : glyph-proc
+			include : MarkSet.b
+			include : Body
+			if topSerif    : include : topSerif
+			if bottomSerif : include : bottomSerif
+			set-base-anchor 'overlayOnBar' (RightSB - 0.5 * Stroke * HVContrast) yOverlay
+
+		create-glyph "dcroat.\(suffix)" : glyph-proc
+			include [refer-glyph "d.\(suffix)"] AS_BASE ALSO_METRICS
+			include : LetterBarOverlay.r.in RightSB XH (Ascender - [if topSerif Stroke 0])
+
+		create-glyph "latn/de.\(suffix)" : glyph-proc
+			include [refer-glyph "d.\(suffix)"] AS_BASE ALSO_METRICS
+			local xLeft : mix RightSB SB 0.9
+			include : HBarTop xLeft (RightSB + O) CAP
+			if topSerif : include : DownwardLeftSerif xLeft CAP : Math.min VJut (0.8 * (Ascender - XH))
+
+	select-variant 'd' 'd'
+	select-variant 'dcroat' 0x111 (follow -- 'd')
+	select-variant 'latn/de' 0x18C (follow -- 'd')
+	link-reduced-variant 'd/sansSerif' 'd' MathSansSerif
+	link-reduced-variant 'd/phoneticLeft' 'd'
+	link-reduced-variant 'd/hookBottomBase' 'd'
+	CreateAccentedComposition 'dTildeOver' 0x1D6D 'd' 'tildeOverOnBar'
+
+	derive-composites 'dPalatalHook' 0x1D81 'd/hookBottomBase' : PalatalHook.r
+		xLink -- RightSB
+		x -- (RightSB + SideJut)
+		y -- 0
+
+	define DCurlyTailConfig : object
+		toothedSerifless  { false }
+		toothedTopSerifed { true  }
+
+	foreach { suffix { fSerif } } [Object.entries DCurlyTailConfig] : do
+		create-glyph "dCurlyTail.\(suffix)" : glyph-proc
+			local fine : AdviceStroke 4
+			local rinner : clamp (Width * 0.065) (XH * 0.05) (fine * 0.35)
+			local wide Stroke
+			local m1 : Math.min RightSB (Width - rinner * 2 - fine - OX)
+			local x2 : mix SB m1 0.5
+			local y2 : 0 - fine - rinner *  1.25
+			include : MarkSet.e
+			include : OBarRightShape XH m1
+			include : dispiro
+				widths.rhs
+				flat m1 Ascender [heading Downward]
+				curl m1 (rinner * 2 + fine)
+				CurlyTail fine rinner m1 0 (m1 + rinner * 2 + fine) x2 y2
+			if fSerif : include : LeftwardTopSerif (m1 - Stroke * HVContrast) Ascender SideJut
+
+	select-variant 'dCurlyTail' 0x221
+
+	define yDHookTopConnect : Ascender - Hook - HalfStroke
+	create-glyph 'dHookTop.toothedSerifless' : glyph-proc
+		include : MarkSet.b
+		include : OBarRightShape
+		include : VBarRight RightSB 0 yDHookTopConnect
+		include : VerticalHook.r RightSB yDHookTopConnect HookX (-Hook)
+
+	create-glyph 'dHookTop.toothedBottomSerifed' : glyph-proc
+		include : MarkSet.b
+		include : OBarRightShape
+		include : VBarRight RightSB 0 yDHookTopConnect
+		include : VerticalHook.r RightSB yDHookTopConnect HookX (-Hook)
+		include : tagged 'serifRB' : RightwardBottomSerif RightSB 0 SideJut
+
+	create-glyph 'dHookTop.tailedSerifless' : glyph-proc
+		include : MarkSet.b
+		include : OBarRightShape
+		include : RightwardTailedBar RightSB 0 yDHookTopConnect
+		include : VerticalHook.r RightSB yDHookTopConnect HookX (-Hook)
+
+	create-glyph 'dHookTop.toothlessCornerSerifless' : glyph-proc
+		include : MarkSet.b
+		include : OBarRightToothlessShape XH RightSB DToothlessRise DMBlend
+		include : VBarRight RightSB DToothlessRise yDHookTopConnect
+		include : VerticalHook.r RightSB yDHookTopConnect HookX (-Hook)
+
+	create-glyph 'dHookTop.toothlessCornerSeriflessHBB' : glyph-proc
+		include : MarkSet.b
+		include : OBarRightToothlessShape XH RightSB DToothlessRise DMBlend
+		include : VBarRight RightSB 0 yDHookTopConnect
+		include : VerticalHook.r RightSB yDHookTopConnect HookX (-Hook)
+
+	create-glyph 'dHookTop.toothlessRoundedSerifless' : glyph-proc
+		include : MarkSet.b
+		include : OBarRightRoundedShape XH RightSB yDHookTopConnect
+		include : VerticalHook.r RightSB yDHookTopConnect HookX (-Hook)
+
+	create-glyph 'dHookTop.toothlessRoundedSeriflessHBB' : glyph-proc
+		include : MarkSet.b
+		include : OBarRightRoundedShape XH RightSB yDHookTopConnect
+		include : VBarRight RightSB 0 yDHookTopConnect
+		include : VerticalHook.r RightSB yDHookTopConnect HookX (-Hook)
+
+	select-variant 'dHookTop' 0x257
+	link-reduced-variant 'dHookTop/hookBottomBase' 'dHookTop'
+
+	derive-composites 'dHookBottom' 0x256 'd/hookBottomBase'
+		VerticalHook.r RightSB 0 HookX Hook
+	derive-composites 'dHookTopBottom' 0x1D91 'dHookTop/hookBottomBase'
+		VerticalHook.r RightSB 0 HookX Hook
+
+	derive-multi-part-glyphs 'ddot' 0x1E0B {'d' 'dotAbove'} : lambda [srcs gr] : glyph-proc
+		local { base mark } srcs
+		include : refer-glyph mark
+		include : Translate (Width - HalfStroke) 0
+		include [refer-glyph base] AS_BASE
+
+	glyph-block-import Letter-Blackboard : BBS BBD BBBarRight
+	create-glyph 'mathbb/d' 0x1D555 : glyph-proc
+		include : MarkSet.b
+		include : BBBarRight RightSB 0 Ascender
+		include : intersection
+			OShapeOutline.NoOvershoot XH 0 SB (RightSB - BBD - BBS * HVContrast)
+			VBarLeft (SB + BBD + OX) 0 XH BBS
+		include : OBarRightShape
+			right -- RightSB - BBD
+			top  -- XH
+			stroke -- BBS
