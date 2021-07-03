@@ -1,0 +1,39 @@
+$$include '../../../meta/macros.ptl'
+
+import [mix linreg clamp fallback] from '../../../support/utils'
+import [DesignParameters] from '../../../meta/aesthetics'
+import '../../../support/point' as Point
+
+glyph-module
+
+glyph-block Symbol-Math-Letter-Like : begin
+	glyph-block-import CommonShapes
+	glyph-block-import Common-Derivatives
+	glyph-block-import Letter-Latin-Upper-A : LambdaShape AMaskShape DeltaShape
+	glyph-block-import Letter-Latin-Upper-E : RevEShape
+
+	create-glyph 'forall' 0x2200 : glyph-proc
+		include : LambdaShape [DivFrame 1] CAP OperatorStroke true
+		eject-contour 'serif'
+		include : intersection
+			AMaskShape [DivFrame 1] CAP OperatorStroke true
+			HBar 0 Width (XH / 2) OperatorStroke
+		include : FlipAround Middle (CAP / 2)
+
+	create-glyph 'exists' 0x2203 : glyph-proc
+		include : RevEShape CAP (pyBar -- 0.51)
+
+	create-glyph 'emptyset' 0x2205 : glyph-proc
+		include : OShape CAP 0 SB RightSB OperatorStroke
+
+		local fine : OperatorStroke / 2
+		include : dispiro
+			widths.center OperatorStroke
+			flat (SB + O + fine) [mix CAP 0 1.05]
+			curl (RightSB - O - fine) [mix 0 CAP 1.05]
+
+	create-glyph 'increment' 0x2206 : glyph-proc
+		include : MarkSet.capital
+		include : DeltaShape [DivFrame 1] CAP OperatorStroke true
+
+	turned 'nabla' 0x2207 'increment' Middle (CAP / 2)

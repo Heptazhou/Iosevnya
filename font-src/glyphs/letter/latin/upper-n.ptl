@@ -1,0 +1,107 @@
+$$include '../../../meta/macros.ptl'
+
+import [mix linreg clamp fallback] from '../../../support/utils'
+import [DesignParameters] from '../../../meta/aesthetics'
+import [Dotless CvDecompose MathSansSerif] from "../../../support/gr"
+
+glyph-module
+
+glyph-block Letter-Latin-Upper-N : begin
+	glyph-block-import CommonShapes
+	glyph-block-import Common-Derivatives
+	glyph-block-import Marks : markHalfStroke
+	glyph-block-import Letter-Shared-Shapes : SerifFrame
+
+
+	define BODY-SYMMETRIC  1
+	define BODY-ASYMMETRIC 2
+
+	define SLAB-AUTO   1
+	define SLAB-MOTION 2
+
+	define [StdNSerifs top left right sw xn] : glyph-proc
+		include : tagged 'serifLT'
+			LeftwardTopSerif left top (xn * Jut - 0.5 * sw * HVContrast)
+		include : tagged 'serifRB'
+			CenterTopSerif (right - 0.5 * sw * HVContrast) top (xn * Jut)
+		include : tagged 'serifLB'
+			CenterBottomSerif (left + 0.5 * sw * HVContrast) 0 (xn * Jut)
+
+	define [NShape] : params [bodyType slabType top left right [crowd 2] [crDiag 4]] : glyph-proc
+		local swDiag : AdviceStroke crDiag
+		local stroke : AdviceStroke crowd
+		local yEnd : match bodyType
+			[Just BODY-SYMMETRIC]    0
+			[Just BODY-ASYMMETRIC] : top * 0.375
+
+		include : union
+			match bodyType
+				[Just BODY-SYMMETRIC] : dispiro
+					flat left 0 [widths.heading 0 stroke Upward]
+					curl left (top * 0.4) [heading Upward]
+					straight.up.end left top [widths.heading 0 swDiag Upward]
+				[Just BODY-ASYMMETRIC] : VBarLeft left 0 top stroke
+			match bodyType
+				[Just BODY-SYMMETRIC] : dispiro
+					flat right top [widths.heading 0 stroke Downward]
+					curl right (top * 0.6) [heading Downward]
+					straight.down.end right 0 [widths.heading 0 swDiag Downward]
+				[Just BODY-ASYMMETRIC] : VBarRight right 0 top stroke
+			intersection [Rect top 0 left right]
+				ExtLineCenter 2 swDiag (left + swDiag) top (right - swDiag) yEnd
+
+		local sf : SerifFrame top 0 left right stroke
+		include : match slabType
+			[Just SLAB-AUTO]   : NeedSlab SLAB : composite-proc sf.lt.outer sf.lb.full sf.rt.full
+			[Just SLAB-MOTION] : composite-proc sf.lt.full
+
+	define NConfig : object
+		standard                { BODY-SYMMETRIC  4 SLAB-AUTO   }
+		motionSerifed           { BODY-SYMMETRIC  4 SLAB-MOTION }
+		asymmetric              { BODY-ASYMMETRIC 3 SLAB-AUTO   }
+		asymmetricMotionSerifed { BODY-ASYMMETRIC 3 SLAB-MOTION }
+
+	foreach { suffix { bodyType crD slabType } } [Object.entries NConfig] : do
+		create-glyph "N.\(suffix)" : glyph-proc
+			include : MarkSet.capital
+			include : NShape bodyType slabType CAP SB RightSB (crDiag -- crD)
+			set-base-anchor 'trailing' (RightSB - markHalfStroke) 0
+
+		create-glyph "Nltail.\(suffix)" : glyph-proc
+			include [refer-glyph "N.\(suffix)"] AS_BASE ALSO_METRICS
+			eject-contour 'serifLB'
+			include : VerticalHook (SB + HalfStroke * HVContrast) 0 (-HookX) Hook
+
+		create-glyph "smcpN.\(suffix)" : glyph-proc
+			include : MarkSet.e
+			include : NShape bodyType slabType XH SB RightSB (crDiag -- crD)
+			set-base-anchor 'trailing' (RightSB - markHalfStroke) 0
+
+		create-glyph "currency/nairaSignBase.\(suffix)" : glyph-proc
+			include : NShape bodyType slabType CAP (SB * 1.25) (Width - SB * 1.25) (crowd -- 3.5) (crDiag -- 4)
+
+	select-variant 'N' 'N'
+	link-reduced-variant 'N/sansSerif' 'N' MathSansSerif
+	alias 'grek/Nu' 0x39D 'N'
+	alias-reduced-variant 'grek/Nu/sansSerif' 'grek/Nu' 'N/sansSerif' MathSansSerif
+
+	select-variant 'smcpN' 0x274 (follow -- 'N')
+	select-variant 'Nltail' 0x19D  (follow -- 'N')
+	select-variant 'currency/nairaSignBase' (follow -- 'N')
+
+	glyph-block-import Letter-Blackboard : BBS BBD
+	create-glyph 'mathbb/N' 0x2115 : glyph-proc
+		include : MarkSet.capital
+		include : VBarLeft SB 0 CAP BBS
+		include : VBarRight RightSB 0 CAP BBS
+		include : intersection
+			Rect CAP 0 SB RightSB
+			union
+				dispiro
+					widths.center BBS
+					corner (SB + BBS * HVContrast) CAP
+					corner (RightSB - BBS * HVContrast / 2) (CAP / 5)
+				dispiro
+					widths.center BBS
+					corner (SB + BBS * HVContrast / 2) (CAP - (CAP / 5))
+					corner (RightSB - BBS * HVContrast) 0
