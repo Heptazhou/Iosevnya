@@ -1,0 +1,140 @@
+$$include '../../../meta/macros.ptl'
+
+import [mix linreg clamp fallback] from"../../../support/utils.mjs"
+
+glyph-module
+
+glyph-block Letter-Cyrillic-Sha : begin
+	glyph-block-import CommonShapes
+	glyph-block-import Common-Derivatives
+	glyph-block-import Letter-Shared-Shapes : RightwardTailedBar CyrDescender
+
+	define [CyrShaShape top df] : glyph-proc
+		include : union
+			HBar.b df.leftSB df.rightSB 0
+			VBar.l df.leftSB 0 top df.mvs
+			VBar.r df.rightSB 0 top df.mvs
+			VBar.m df.middle 0 top df.mvs
+
+		if SLAB : begin
+			include : tagged 'serifLB' : HSerif.lb df.leftSB 0 SideJut
+			include : tagged 'serifRB' : HSerif.rb df.rightSB 0 SideJut
+
+			local jut : Jut * df.mvs / Stroke + O
+			if (df.width > 7 * para.refJut) : begin
+				include : tagged 'serifLT'
+					HSerif.mt (df.leftSB + 0.5 * df.mvs * HVContrast) top jut df.mvs
+				include : tagged 'serifMT'
+					HSerif.mt df.middle top jut df.mvs
+				include : tagged 'serifRT'
+					HSerif.mt (df.rightSB - 0.5 * df.mvs * HVContrast) top jut df.mvs
+			: else : begin
+				include : tagged 'serifLT' : HSerif.lt df.leftSB top SideJut
+				include : tagged 'serifRT' : HSerif.rt df.rightSB top SideJut
+
+	create-glyph 'cyrl/Sha' 0x428 : glyph-proc
+		local df : DivFrame para.diversityM 3
+		set-width df.width
+		include : df.markSet.capital
+		include : CyrShaShape CAP df
+
+	create-glyph 'cyrl/sha.upright' : glyph-proc
+		local df : DivFrame para.diversityM 3
+		set-width df.width
+		include : df.markSet.e
+		include : CyrShaShape XH df
+
+	alias 'smcpMTurned' 0xA7FA 'cyrl/sha.upright'
+
+	turned 'cyrl/sha.italic.toothedSerifless' null 'm.serifless' [DivFrame para.diversityM 3].middle (XH / 2)
+	turned 'cyrl/sha.italic.toothedSerifed' null 'm.serifed' [DivFrame para.diversityM 3].middle (XH / 2)
+	turned 'cyrl/sha.italic.toothedMotionSerifed' null 'm.topLeftAndBottomRightSerifed' [DivFrame para.diversityM 3].middle (XH / 2)
+	create-glyph 'cyrl/sha.italic.toothedBottomRightSerifed' : glyph-proc
+		local df : DivFrame para.diversityM 3
+		set-width df.width
+		include [refer-glyph 'm.topLeftAndBottomRightSerifed'] AS_BASE
+		eject-contour 'serifRB'
+		include : FlipAround df.middle (XH / 2)
+
+	create-glyph 'cyrl/sha.italic.tailedSerifless' : glyph-proc
+		local df : DivFrame para.diversityM 3
+		set-width df.width
+		include [refer-glyph 'm.serifless'] AS_BASE
+		eject-contour 'barL'
+		include : FlipAround df.middle (XH / 2)
+		include : RightwardTailedBar df.rightSB 0 XH (sw -- df.mvs)
+
+	create-glyph 'cyrl/sha.italic.tailedMotionSerifed' : glyph-proc
+		local df : DivFrame para.diversityM 3
+		set-width df.width
+		include [refer-glyph 'm.topLeftAndBottomRightSerifed'] AS_BASE
+		eject-contour 'barL'
+		eject-contour 'serifLT'
+		include : FlipAround df.middle (XH / 2)
+		include : RightwardTailedBar df.rightSB 0 XH (sw -- df.mvs)
+
+	create-glyph 'cyrl/sha.italic.tailedSerifed' : glyph-proc
+		local df : DivFrame para.diversityM 3
+		set-width df.width
+		include [refer-glyph 'm.serifed'] AS_BASE
+		eject-contour 'barL'
+		eject-contour 'serifLT'
+		include : FlipAround df.middle (XH / 2)
+		include : RightwardTailedBar df.rightSB 0 XH (sw -- df.mvs)
+
+	create-glyph 'cyrl/sha.italic.motionSerifedShachaBase' : glyph-proc
+		local df : DivFrame para.diversityM 3
+		set-width df.width
+		include [refer-glyph 'm.topLeftAndBottomRightSerifed'] AS_BASE
+		eject-contour 'serifLT'
+		include : FlipAround df.middle (XH / 2)
+
+	create-glyph 'cyrl/sha.italic.serifedShachaBase' : glyph-proc
+		local df : DivFrame para.diversityM 3
+		set-width df.width
+		include [refer-glyph 'm.serifed'] AS_BASE
+		eject-contour 'serifLT'
+		include : FlipAround df.middle (XH / 2)
+
+	select-variant 'cyrl/sha.italic'
+	alias 'cyrl/sha.BGR' null 'cyrl/sha.italic'
+
+	define [CyrShchaShape top df] : glyph-proc
+		include : CyrShaShape top df
+		#eject-contour 'serifRB'
+		include : CyrDescender.rSideJut df.rightSB 0 (refSw -- df.mvs)
+
+	create-glyph 'cyrl/Shcha' 0x429 : glyph-proc
+		local df : DivFrame para.diversityM 3
+		set-width df.width
+		include : df.markSet.capital
+		include : CyrShchaShape CAP df
+
+	create-glyph 'cyrl/shcha.upright' : glyph-proc
+		local df : DivFrame para.diversityM 3
+		set-width df.width
+		include : df.markSet.e
+		include : CyrShchaShape XH df
+
+	create-glyph 'cyrl/shcha.italic.toothedSerifless' : glyph-proc
+		local df : DivFrame para.diversityM 3
+		set-width df.width
+		include [refer-glyph 'cyrl/sha.italic.toothedSerifless'] AS_BASE
+		include : CyrDescender.rSideJut df.rightSB 0 (refSw -- df.mvs)
+
+	create-glyph 'cyrl/shcha.italic.toothedMotionSerifed' : glyph-proc
+		local df : DivFrame para.diversityM 3
+		set-width df.width
+		include [refer-glyph 'cyrl/sha.italic.motionSerifedShachaBase'] AS_BASE
+		include : CyrDescender.rSideJut df.rightSB 0 (refSw -- df.mvs)
+
+	create-glyph 'cyrl/shcha.italic.toothedSerifed' : glyph-proc
+		local df : DivFrame para.diversityM 3
+		set-width df.width
+		include [refer-glyph 'cyrl/sha.italic.serifedShachaBase'] AS_BASE
+		include : CyrDescender.rSideJut df.rightSB 0 (refSw -- df.mvs)
+
+	select-variant 'cyrl/shcha.italic'
+	alias 'cyrl/shcha.BGR' null 'cyrl/shcha.italic'
+
+	derive-composites 'cyrl/te.SRB' null 'cyrl/sha.italic' 'macronAbove'
