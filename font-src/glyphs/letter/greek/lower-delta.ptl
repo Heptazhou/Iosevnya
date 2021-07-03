@@ -1,0 +1,43 @@
+$$include '../../../meta/macros.ptl'
+
+import [mix barmixL linreg clamp fallback] from '../../../support/utils'
+import [DesignParameters] from '../../../meta/aesthetics'
+
+glyph-module
+
+glyph-block Letter-Greek-Lower-Delta : begin
+	glyph-block-import CommonShapes
+	glyph-block-import Common-Derivatives
+
+	create-glyph 'grek/delta' 0x3B4 : glyph-proc
+		include : MarkSet.b
+
+		local yRingTop : Stroke * 0.25 + [mix 0 XH (15 / 16)]
+		local xNeck : mix SB RightSB 0.07
+		local xOTLeft : mix SB RightSB 0.5
+		local fine : Stroke * 0.5
+
+		include : dispiro
+			widths.rhs
+			g4   [mix Middle RightSB 0.85] ([mix XH CAP 0.8] - Stroke) [heading Leftward]
+			alsoThru 0.5 0.7
+			g4   Middle (CAP - O - Stroke)
+			archv 2
+			g4   (xNeck + Stroke) [mix (CAP - O - Stroke) yRingTop 0.5]
+			arcvh 2
+			g4   xOTLeft yRingTop [heading Rightward]
+			alsoThruThem : list {0.25 0.05} {0.5 0.13}
+			flat (RightSB - OX) (yRingTop - SmallSmoothB)
+			curl (RightSB - OX) SmallSmoothA
+			arcvh
+			g4.left.mid (Middle + CorrectionOMidS) O
+			archv
+			flat (SB + OX) SmallSmoothB
+			curl (SB + OX) (yRingTop - SmallSmoothA)
+			arcvh
+			g4   xOTLeft (yRingTop - (Stroke - fine) / 2) [widths 0 fine]
+
+	alias 'cyrl/be.SRB' null 'grek/delta'
+	alias 'latindelta' 0x1E9F 'grek/delta'
+
+	turned 'turndelta' 0x18D 'grek/delta' Middle (XH / 2) [MarkSet.p]
