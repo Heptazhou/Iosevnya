@@ -1,0 +1,86 @@
+$$include '../../../meta/macros.ptl'
+
+import [mix linreg clamp fallback] from"../../../support/utils.mjs"
+import [Dotless CvDecompose MathSansSerif] from"../../../support/gr.mjs"
+
+glyph-module
+
+glyph-block Letter-Latin-Lower-P : begin
+	glyph-block-import CommonShapes
+	glyph-block-import Common-Derivatives
+	glyph-block-import Letter-Shared : CreateAccentedComposition
+	glyph-block-import Letter-Shared-Shapes : DToothlessRise DMBlend HooktopLeftBar
+
+	define [SmallPSerifLT] : tagged 'serifLT' : LeftwardTopSerif SB XH SideJut
+	define [SmallPSerifLB] : tagged 'serifLB' : union
+		LeftwardBottomSerif (SB + HalfStroke * HVContrast) Descender Jut
+		RightwardBottomSerif (SB + HalfStroke * HVContrast) Descender MidJutSide
+
+	define [EaredBody] : glyph-proc
+		include : tagged 'bowl' : OBarLeftShape
+		include : tagged 'stemLeft' : VBarLeft SB Descender XH
+
+	define [EarlessCornerBody] : glyph-proc
+		include : tagged 'bowl' : OBarRightToothlessShape XH RightSB DToothlessRise DMBlend
+		include : FlipAround Middle (XH / 2)
+		include : tagged 'stemLeft' : VBarLeft SB Descender (XH - DToothlessRise)
+
+	define [EarlessRoundedBody] : glyph-proc
+		include : tagged 'bowl' : OBarRightRoundedShape XH RightSB CAP
+		include : FlipAround Middle (XH / 2)
+
+	define [FullSerifs] : glyph-proc : if SLAB : begin
+		include : SmallPSerifLT
+		include : SmallPSerifLB
+
+	define [MotionSerif] : glyph-proc : if SLAB : begin
+		include : SmallPSerifLT
+
+	define [BottomSerif] : glyph-proc : if SLAB : begin
+		include : SmallPSerifLT
+
+	define PConfig : object
+		eared          { EaredBody          FullSerifs  SLAB }
+		motionSerifed  { EaredBody          MotionSerif SLAB }
+		earlessCorner  { EarlessCornerBody  BottomSerif SLAB }
+		earlessRounded { EarlessRoundedBody BottomSerif SLAB }
+
+	foreach { suffix { Body Serifs doTS }} [Object.entries PConfig] : do
+		local yOverlay : mix 0 (Descender + [if doTS Stroke 0]) 0.45
+		create-glyph "p.\(suffix)" : glyph-proc
+			include : MarkSet.p
+			include : Body
+			include : Serifs
+			set-base-anchor 'overlayOnBar' (SB + 0.5 * Stroke * HVContrast) yOverlay
+
+	select-variant 'p' 'p'
+	link-reduced-variant 'p/sansSerif' 'p' MathSansSerif
+	link-reduced-variant 'p/hookTopBase' 'p'
+	select-variant 'cyrl/er' 0x440 (shapeFrom -- 'p')
+
+	CreateAccentedComposition 'pTildeOver' 0x1D71 'p' 'tildeOverOnBar'
+
+	derive-glyphs 'cyrl/rrTick' 0x48F 'cyrl/er' : lambda [src gr] : glyph-proc
+		include [refer-glyph src] AS_BASE ALSO_METRICS
+		include : dispiro
+			widths.center [AdviceStroke 4]
+			flat [mix SB RightSB 0.5]   (HalfStroke + XH * 0.25)
+			curl [mix SB RightSB 0.875] (HalfStroke - XH * 0.25)
+
+	glyph-block-import Letter-Blackboard : BBS BBD BBBarLeft
+	create-glyph 'mathbb/p' 0x1D561 : glyph-proc
+		include : MarkSet.p
+		include : BBBarLeft SB Descender XH
+		include : intersection
+			OShapeOutline.NoOvershoot XH 0 (SB + BBD + BBS * HVContrast) RightSB
+			VBarRight (RightSB - BBD - OX) 0 XH BBS
+		include : OBarLeftShape
+			left -- SB + BBD
+			top  -- XH
+			stroke -- BBS
+
+	derive-glyphs 'pHookTop' 0x1A5 "p/hookTopBase" : function [src gr] : glyph-proc
+		include [refer-glyph src] AS_BASE ALSO_METRICS
+		eject-contour 'serifLT'
+		eject-contour 'stemLeft'
+		include : HooktopLeftBar (bottom -- Descender)
