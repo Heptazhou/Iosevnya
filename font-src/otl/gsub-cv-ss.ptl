@@ -1,0 +1,83 @@
+import [AddLookup AddCommonFeature PickFeature AdeFeatureLookup PickLookup BeginLookupBlock EndLookupBlock ChainRuleBuilder] from"./table-util.mjs"
+import [Cv AnyCv CvDecompose RightDependentLink RightDependentTrigger] from"../support/gr.mjs"
+
+extern Map
+extern Set
+
+define look-around null
+define-operator "~>" 880 'right' : syntax-rules
+	`(@l ~> @r) `{.left @l .right @r}
+
+define [FeatureName tag] : tag + '_cvss'
+define [CvLookupName tag]  : 'lookup_cv_' + tag
+define [SsLookupName tag]  : 'lookup_ss_' + tag
+
+export : define [buildCVSS sink para glyphStore] : begin
+	if [not para.enableCvSs] : return nothing
+	define {chain-rule} : ChainRuleBuilder sink
+
+	local rec : BeginLookupBlock sink
+	local cvLookupNameSet : new Set
+	local ssLookupNameSet : new Set
+
+	# Decomposition of enclosures
+	define decompositions {.}
+	foreach { gid g } [glyphStore.namedEntries] : begin
+		local parts : CvDecompose.get g
+		if (parts && parts.length) : set decompositions.(gid) parts
+
+	define lookupNameCvDecompose : AddLookup sink : object
+		.type 'gsub_multiple'
+		.substitutions decompositions
+
+	define [addFeatureAndLookup tag lookupName init] : begin
+		define feature : PickFeature sink [FeatureName tag]
+		AddCommonFeature sink feature
+
+		define lookup : PickLookup sink lookupName init
+		AdeFeatureLookup feature lookupNameCvDecompose
+		AdeFeatureLookup feature lookupName
+		sink.lookupDep.push { lookupNameCvDecompose lookupName }
+		cvLookupNameSet.add lookupName
+
+
+	# cvxx
+	foreach {gn glyph} [glyphStore.namedEntries] : if [not : CvDecompose.get glyph] : do
+		foreach [gr : items-of : AnyCv.query glyph] : if gr.tag : begin
+			define lookupName : CvLookupName gr.tag
+			if [not : cvLookupNameSet.has lookupName] : begin
+				addFeatureAndLookup gr.tag lookupName {.type 'gsub_alternate' .substitutions {.}}
+				cvLookupNameSet.add lookupName
+
+			local st [PickLookup sink lookupName].substitutions
+			if [not st.(gn)] : set st.(gn) { }
+			set st.(gn).(gr.rank - 1) : glyphStore.ensureExists : gr.get glyph
+
+	# ssxx
+	foreach {name composition} para.variants.composites : if composition.tag : do
+		define lookupName : SsLookupName composition.tag
+		if [not : ssLookupNameSet.has lookupName] : begin
+			addFeatureAndLookup composition.tag lookupName {.type 'gsub_single' .substitutions {.}}
+			cvLookupNameSet.add lookupName
+
+		define st [PickLookup sink lookupName].substitutions
+		define decomp : composition.decompose para para.variants.selectorTree
+		foreach { prime pv } [items-of decomp] : if (pv.tag && pv.rank) : begin
+			local gr : Cv pv.tag pv.rank
+			foreach {gn glyph} [glyphStore.namedEntries] : if [not : CvDecompose.get glyph] : begin
+				local substituted : gr.get glyph
+				if substituted : set st.(gn) substituted
+
+	# If there are holes in the alternates list, fill them
+	foreach lutn cvLookupNameSet : begin
+		local st [PickLookup sink lutn].substitutions
+		foreach { k v } [pairs-of st] : foreach idx [range 0 v.length] : if [not v.(idx)]
+			set v.(idx) k
+
+	# Lookup dependency
+	foreach lutnCv cvLookupNameSet : foreach lutnSS ssLookupNameSet : begin
+		sink.lookupDep.push { lutnCv lutnSS }
+
+	EndLookupBlock rec sink
+
+define [objectIsNotEmpty obj] : obj && [Object.keys obj].length
