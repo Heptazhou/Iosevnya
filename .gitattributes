@@ -1,0 +1,5 @@
+
+*.toml linguist-detectable
+
+*.sample.toml -linguist-detectable
+variants.toml -linguist-detectable
