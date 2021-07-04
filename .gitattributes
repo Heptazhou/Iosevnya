@@ -1,0 +1,5 @@
+
+*.cmd text eol=crlf
+*.mjs linguist-vendored
+private-build-plans.toml linguist-detectable
+verdafile.mjs -linguist-vendored
