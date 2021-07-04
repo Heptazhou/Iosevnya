@@ -1,0 +1,5 @@
+
+*.cmd text eol=crlf
+/*/**.mjs linguist-vendored
+parameters.toml linguist-detectable
+private-build-plans.toml linguist-detectable
