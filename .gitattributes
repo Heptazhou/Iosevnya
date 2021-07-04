@@ -1,0 +1,5 @@
+
+*.cmd text eol=crlf
+/font-src/*/**.mjs linguist-vendored
+parameters.toml linguist-detectable
+private-build-plans.toml linguist-detectable
