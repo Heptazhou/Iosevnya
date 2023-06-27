@@ -167,7 +167,7 @@ packages:
       '@ot-builder/bin-util': 1.6.4
       '@ot-builder/errors': 1.6.4
       '@ot-builder/prelude': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/bin-util@1.6.4:
@@ -176,14 +176,14 @@ packages:
       '@ot-builder/common-impl': 1.6.4
       '@ot-builder/errors': 1.6.4
       '@ot-builder/prelude': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/cli-help-shower@1.6.4:
     resolution: {integrity: sha512-e7Rns2zN5jD4/BIY7CzhWpMNC2DA+CXOuyQ5ykIxAlYGApwy5exCVLolF+CzcAqSM8puGqYKivU+3Gz7OFu31A==}
     dependencies:
       chalk: 4.1.2
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/cli-proc@1.6.4:
@@ -196,7 +196,7 @@ packages:
       '@ot-builder/primitive': 1.6.4
       '@ot-builder/rectify': 1.6.4
       '@ot-builder/trace': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/cli-shared@1.6.4:
@@ -204,20 +204,20 @@ packages:
     dependencies:
       '@ot-builder/io-bin-font': 1.6.4
       '@ot-builder/ot': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/common-impl@1.6.4:
     resolution: {integrity: sha512-bBKlf/parERI/u81J9Pg7OiF1oGiiZiyQLI4CDgal+KIYrfcH70XTPdbLZfq17ME4etHaiEqZ0oiajodWn5pEQ==}
     dependencies:
       '@ot-builder/prelude': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/errors@1.6.4:
     resolution: {integrity: sha512-Aq/wfM5ewWH/za6KRdbZoX+B+c4vH0xjyDHMlc6zZCP38PZTAB7h0KwLZJR6vcrpxXTHsTFsANQ8L/EjkijvVQ==}
     dependencies:
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/io-bin-cff@1.6.4:
@@ -234,7 +234,7 @@ packages:
       '@ot-builder/stat-glyphs': 1.6.4
       '@ot-builder/var-store': 1.6.4
       '@ot-builder/variance': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/io-bin-encoding@1.6.4:
@@ -249,7 +249,7 @@ packages:
       '@ot-builder/ot-sfnt': 1.6.4
       '@ot-builder/prelude': 1.6.4
       '@ot-builder/primitive': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/io-bin-ext-private@1.6.4:
@@ -264,7 +264,7 @@ packages:
       '@ot-builder/ot-sfnt': 1.6.4
       '@ot-builder/prelude': 1.6.4
       '@ot-builder/primitive': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/io-bin-font@1.6.4:
@@ -289,7 +289,7 @@ packages:
       '@ot-builder/ot-sfnt': 1.6.4
       '@ot-builder/ot-vtt-private': 1.6.4
       '@ot-builder/prelude': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/io-bin-glyph-store@1.6.4:
@@ -310,7 +310,7 @@ packages:
       '@ot-builder/stat-glyphs': 1.6.4
       '@ot-builder/var-store': 1.6.4
       '@ot-builder/variance': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/io-bin-layout@1.6.4:
@@ -329,7 +329,7 @@ packages:
       '@ot-builder/primitive': 1.6.4
       '@ot-builder/var-store': 1.6.4
       '@ot-builder/variance': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/io-bin-metadata@1.6.4:
@@ -346,7 +346,7 @@ packages:
       '@ot-builder/primitive': 1.6.4
       '@ot-builder/var-store': 1.6.4
       '@ot-builder/variance': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/io-bin-metric@1.6.4:
@@ -361,7 +361,7 @@ packages:
       '@ot-builder/primitive': 1.6.4
       '@ot-builder/var-store': 1.6.4
       '@ot-builder/variance': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/io-bin-name@1.6.4:
@@ -378,7 +378,7 @@ packages:
       '@ot-builder/prelude': 1.6.4
       '@ot-builder/primitive': 1.6.4
       iconv-lite: 0.6.3
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/io-bin-sfnt@1.6.4:
@@ -390,7 +390,7 @@ packages:
       '@ot-builder/ot-sfnt': 1.6.4
       '@ot-builder/prelude': 1.6.4
       '@ot-builder/primitive': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/io-bin-ttf@1.6.4:
@@ -406,7 +406,7 @@ packages:
       '@ot-builder/stat-glyphs': 1.6.4
       '@ot-builder/var-store': 1.6.4
       '@ot-builder/variance': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/io-bin-vtt-private@1.6.4:
@@ -424,7 +424,7 @@ packages:
       '@ot-builder/primitive': 1.6.4
       '@ot-builder/variance': 1.6.4
       iconv-lite: 0.6.3
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/ot-encoding@1.6.4:
@@ -432,7 +432,7 @@ packages:
     dependencies:
       '@ot-builder/ot-glyphs': 1.6.4
       '@ot-builder/prelude': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/ot-ext-private@1.6.4:
@@ -440,7 +440,7 @@ packages:
     dependencies:
       '@ot-builder/ot-glyphs': 1.6.4
       '@ot-builder/prelude': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/ot-glyphs@1.6.4:
@@ -450,7 +450,7 @@ packages:
       '@ot-builder/prelude': 1.6.4
       '@ot-builder/primitive': 1.6.4
       '@ot-builder/variance': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/ot-layout@1.6.4:
@@ -460,7 +460,7 @@ packages:
       '@ot-builder/prelude': 1.6.4
       '@ot-builder/primitive': 1.6.4
       '@ot-builder/variance': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/ot-metadata@1.6.4:
@@ -470,7 +470,7 @@ packages:
       '@ot-builder/prelude': 1.6.4
       '@ot-builder/primitive': 1.6.4
       '@ot-builder/variance': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/ot-name@1.6.4:
@@ -478,7 +478,7 @@ packages:
     dependencies:
       '@ot-builder/prelude': 1.6.4
       '@ot-builder/primitive': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/ot-sfnt@1.6.4:
@@ -486,7 +486,7 @@ packages:
     dependencies:
       '@ot-builder/prelude': 1.6.4
       '@ot-builder/primitive': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/ot-standard-glyph-namer@1.6.4:
@@ -495,7 +495,7 @@ packages:
       '@ot-builder/ot-glyphs': 1.6.4
       '@ot-builder/prelude': 1.6.4
       aglfn: 1.0.2
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/ot-vtt-private@1.6.4:
@@ -504,7 +504,7 @@ packages:
       '@ot-builder/ot-glyphs': 1.6.4
       '@ot-builder/prelude': 1.6.4
       '@ot-builder/variance': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/ot@1.6.4:
@@ -522,13 +522,13 @@ packages:
       '@ot-builder/ot-vtt-private': 1.6.4
       '@ot-builder/prelude': 1.6.4
       '@ot-builder/variance': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/prelude@1.6.4:
     resolution: {integrity: sha512-CzzjS5anctVw37ZFWS6uksmyG9WH4LppiTjDHwrCvHNXcqFtO95wL9tY8mOOaN1TwOPgMrsOo1MT2ESiZNB4rg==}
     dependencies:
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/primitive@1.6.4:
@@ -537,7 +537,7 @@ packages:
       '@ot-builder/bin-util': 1.6.4
       '@ot-builder/errors': 1.6.4
       '@ot-builder/prelude': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/rectify@1.6.4:
@@ -549,7 +549,7 @@ packages:
       '@ot-builder/ot-metadata': 1.6.4
       '@ot-builder/prelude': 1.6.4
       '@ot-builder/variance': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/stat-glyphs@1.6.4:
@@ -562,7 +562,7 @@ packages:
       '@ot-builder/prelude': 1.6.4
       '@ot-builder/primitive': 1.6.4
       '@ot-builder/variance': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/trace@1.6.4:
@@ -574,7 +574,7 @@ packages:
       '@ot-builder/ot-metadata': 1.6.4
       '@ot-builder/prelude': 1.6.4
       '@ot-builder/variance': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/var-store@1.6.4:
@@ -587,7 +587,7 @@ packages:
       '@ot-builder/prelude': 1.6.4
       '@ot-builder/primitive': 1.6.4
       '@ot-builder/variance': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@ot-builder/variance@1.6.4:
@@ -597,7 +597,7 @@ packages:
       '@ot-builder/common-impl': 1.6.4
       '@ot-builder/prelude': 1.6.4
       '@ot-builder/primitive': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /@types/json5@0.0.29:
@@ -1842,7 +1842,7 @@ packages:
       '@ot-builder/primitive': 1.6.4
       '@ot-builder/rectify': 1.6.4
       '@ot-builder/trace': 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /otb-ttc-bundle@1.6.4:
@@ -1852,7 +1852,7 @@ packages:
       '@ot-builder/cli-help-shower': 1.6.4
       '@ot-builder/cli-shared': 1.6.4
       ot-builder: 1.6.4
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /p-limit@3.1.0:
@@ -2101,7 +2101,7 @@ packages:
   /spiro@3.0.0:
     resolution: {integrity: sha512-UEhtLWA8fDQuExOKpT3FLa7Rk238G5Bm3wGAxbvnah3H2X6yEL4blIkAsc38wNwMXBwQFRYE6l0Q9X0t1izOxA==}
     dependencies:
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /stop-iteration-iterator@1.0.0:
@@ -2202,8 +2202,8 @@ packages:
       strip-bom: 3.0.0
     dev: true
 
-  /tslib@2.5.3:
-    resolution: {integrity: sha512-mSxlJJwl3BMEQCUNnxXBU9jP4JBktcEGhURcPR6VQVlnP0FdDEsIaz0C35dXNGLyRfrATNofF0F5p2KPxQgB+w==}
+  /tslib@2.6.0:
+    resolution: {integrity: sha512-7At1WUettjcSRHXCyYtTselblcHl9PJFFVKiCAy/bY97+BPZXSQ2wbq0P9s8tK2G7dFQfNnlJnPAiArVBVBsfA==}
 
   /type-check@0.3.2:
     resolution: {integrity: sha512-ZCmOJdvOWDBYJlzAoFkC+Q0+bUyEOS1ltgp1MGU03fqHG+dbi9tBFU2Rd9QKiDZFAYrhPh2JUf7rZRIuHRKtOg==}
@@ -2237,7 +2237,7 @@ packages:
     engines: {node: '>= 8.9.0'}
     dependencies:
       clipper-lib: 6.4.2
-      tslib: 2.5.3
+      tslib: 2.6.0
     dev: false
 
   /unbox-primitive@1.0.2:
@@ -2280,7 +2280,7 @@ packages:
       fs-extra: 10.1.0
       piscina: 3.2.0
       semaphore-async-await: 1.5.1
-      tslib: 2.5.3
+      tslib: 2.6.0
       which: 2.0.2
       yargs: 17.7.2
     dev: true

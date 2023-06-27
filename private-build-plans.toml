@@ -1,4 +1,4 @@
-# https://typeof.net/Iosevka/customizer?cv-capital-a=curly-serifless&cv-capital-j=serifless&cv-capital-k=symmetric-touching-bottom-right-serifed&cv-capital-q=crossing&cv-a=single-storey-tailed&cv-d=tailed-serifless&cv-k=symmetric-touching-bottom-right-serifed&cv-t=flat-hook&cv-u=tailed-serifless&cv-w=straight-flat-top-serifless&cv-y=straight-turn-serifless&cv-lower-lambda=straight-turn&cv-cyrl-capital-ka=curly-serifless&cv-cyrl-capital-u=cursive-flat-hook-serifless&cv-cyrl-capital-ze=unilateral-inward-serifed&cv-cyrl-en=tailed-serifless&cv-cyrl-ka=curly-serifless&cv-cyrl-yeri=round&cv-cyrl-yery=round&cv-cyrl-ze=unilateral-inward-serifed&cv-one=base&cv-four=closed&cv-six=open-contour&cv-eight=two-circles&cv-asterisk=hex-high&cv-paren=large-contour&cv-brace=straight&cv-at=fourfold&cv-percent=rings-continuous-slash&cv-bar=force-upright&cv-pilcrow=low&cv-lig-ltgteq=slanted&cv-lig-neq=more-slanted&cv-lig-equal-chain=without-notch&cv-lig-hyphen-chain=without-notch&ligations=clike
+# https://typeof.net/Iosevka/customizer?cv-capital-a=curly-serifless&cv-capital-j=serifless&cv-capital-k=symmetric-touching-bottom-right-serifed&cv-capital-q=crossing&cv-a=single-storey-tailed&cv-d=tailed-serifless&cv-k=symmetric-touching-bottom-right-serifed&cv-t=flat-hook&cv-u=tailed-serifless&cv-w=straight-flat-top-serifless&cv-y=straight-turn-serifless&cv-lower-lambda=straight-turn&cv-cyrl-capital-ka=curly-serifless&cv-cyrl-capital-u=cursive-flat-hook-serifless&cv-cyrl-capital-ze=unilateral-inward-serifed&cv-cyrl-en=tailed-serifless&cv-cyrl-ka=curly-serifless&cv-cyrl-yeri=round&cv-cyrl-yery=round&cv-cyrl-ze=unilateral-inward-serifed&cv-one=base&cv-four=closed&cv-six=open-contour&cv-eight=two-circles&cv-asterisk=hex-mid&cv-paren=large-contour&cv-brace=straight&cv-at=fourfold&cv-percent=rings-continuous-slash&cv-bar=force-upright&cv-pilcrow=low&cv-lig-ltgteq=slanted&cv-lig-neq=more-slanted&cv-lig-equal-chain=without-notch&cv-lig-hyphen-chain=without-notch&ligations=clike
 
 ### See https://github.com/be5invis/Iosevka/blob/master/doc/custom-build.md for comprehensive
 ### documentation of the options in this file
@@ -48,7 +48,7 @@ one              = "base"
 four             = "closed"
 six              = "open-contour"
 eight            = "two-circles"
-asterisk         = "hex-high"
+asterisk         = "hex-mid"
 paren            = "large-contour"
 brace            = "straight"
 at               = "fourfold"
