@@ -7,7 +7,7 @@ cmd/c pnpm clean
 echo.
 echo.
 pause&cls
-cmd/c pnpm build fonts::%NAME% ttc::%NAME%
+cmd/c pnpm build ttc::%NAME% woff2::%NAME%
 echo.
 echo.
 pause

@@ -1,4 +1,4 @@
-# Copyright (C) 2022-2023 Heptazhou <zhou@0h7z.com>
+# Copyright (C) 2022-2024 Heptazhou <zhou@0h7z.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -17,7 +17,7 @@ try
 	rm.([".eslintrc.json", ".prettierrc.yaml"], force = true)
 	v, f, r = Int[], "verdafile.mjs", r"^[a-z]+(?= \S)|\t*"
 	s = split(read(f, String), "\n")
-	Threads.@threads for i in eachindex(s[1+begin:end-1])
+	Threads.@threads for i ∈ firstindex(s)+1:lastindex(s)-1
 		s[i] == "" != match(r, s[i-1]).match == match(r, s[i+1]).match && push!(v, i)
 	end
 	block = "(?:if|for|while) \\([^\n]+\\)|else)"
@@ -25,6 +25,7 @@ try
 	s = replace(s, Regex("($block \\{\n\\s*([^\n]+)\n\\s*\\}") => s"\1 \2")
 	s = replace(s, Regex("($block \\{(\n\\s*[^;]+;)\n\\s*\\}") => s"\1\2")
 	s = replace(s, Regex("($block \\{(\n\\s*(?:$block \\{\n\\s*[^}]+\n\\s*\\}\n)\\s*\\}\n") => s"\1\2")
+	s = replace(s, r"` \+\n\t+`"s => "")
 	s = replace(s, r"^//[^\n]*\n\K\n+"m => "")
 	write(f, s)
 	@info "完成"

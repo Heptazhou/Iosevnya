@@ -13,6 +13,21 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+const fix(f::String, n::Int) = fix(f, Regex("^\\t*\\K {$n}", "m"))
+const fix(f::String, r::Regex) =
+	for (prefix, ds, fs) ∈ walkdir(".") |> collect
+		prefix = replace(prefix, '\\' => '/') * '/'
+		contains(prefix, "/.git/") && continue
+		contains(prefix, "/node_modules/") && continue
+		f ∈ fs && cd(prefix) do
+			s = t = read(f, String)
+			while contains(s, r)
+				s = replace(s, r => '\t')
+			end
+			s ≠ t && write(f, s)
+		end
+	end
+
 const rmr(path::String)::Int =
 	ispath(path) ? (rm(path, recursive = true); 1) : 0
 
@@ -27,19 +42,18 @@ const list = [
 	"LICENSE.md"
 	"package-lock.json"
 	# path
-	"utility/amend-readme"
-	"utility/copy-char-name-to-markdown.mjs"
-	"utility/create-sha-file.mjs"
-	"utility/export-data"
-	"utility/generate-release-note"
-	"utility/generate-samples"
-	"utility/generate-ttfa-ranges"
-	"utility/transpose-variant-tensor.mjs"
-	"utility/update-package-json-version"
+	"tools/amend-readme"
+	"tools/data-export"
+	"tools/generate-samples"
+	"tools/misc/src/copy-char-name-to-markdown.mjs"
+	"tools/misc/src/create-sha-file.mjs"
+	"tools/misc/src/generate-ttfa-ranges.mjs"
+	"tools/misc/src/update-package-json-version.mjs"
 ]
 
 try
 	occursin(r"iosevnya"i, splitdir(pwd())[2]) || push!(list, ".gitattributes", "package.json", "README.md")
+	fix.(["CHANGELOG.md", "package.json"], 2)
 	n = sum(rmr, list)
 	@info "完成 > $n"
 catch e
