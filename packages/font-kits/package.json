@@ -1,0 +1,14 @@
+{
+	"name": "@iosevka/font-kits",
+	"version": "28.0.4",
+	"private": true,
+	"exports": {
+		"./boole-kit": "./src/boole-kit.mjs",
+		"./spiro-kit": "./src/spiro-kit.mjs"
+	},
+	"dependencies": {
+		"@iosevka/geometry": "workspace:*",
+		"@iosevka/glyph": "workspace:*",
+		"@iosevka/util": "workspace:*"
+	}
+}

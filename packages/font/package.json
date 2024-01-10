@@ -1,0 +1,24 @@
+{
+	"name": "@iosevka/font",
+	"version": "28.0.4",
+	"private": true,
+	"exports": {
+		".": "./src/index.mjs",
+		"./anchor": "./src/anchor.mjs",
+		"./point": "./src/point.mjs",
+		"./transform": "./src/transform.mjs"
+	},
+	"dependencies": {
+		"@iarna/toml": "^2.2.5",
+		"@iosevka/font-glyphs": "workspace:*",
+		"@iosevka/font-otl": "workspace:*",
+		"@iosevka/geometry": "workspace:*",
+		"@iosevka/geometry-cache": "workspace:*",
+		"@iosevka/glyph": "workspace:*",
+		"@iosevka/param": "workspace:*",
+		"@iosevka/util": "workspace:*",
+		"harfbuzzjs": "^0.3.4",
+		"ot-builder": "^1.7.3",
+		"semver": "^7.5.4"
+	}
+}

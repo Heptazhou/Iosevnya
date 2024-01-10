@@ -1,0 +1,13 @@
+{
+	"name": "@iosevka/font-otl",
+	"version": "28.0.4",
+	"private": true,
+	"exports": {
+		".": "./src/index.mjs"
+	},
+	"dependencies": {
+		"@iosevka/font-glyphs": "workspace:*",
+		"@iosevka/glyph": "workspace:*",
+		"toposort": "^2.0.2"
+	}
+}
